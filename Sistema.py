@@ -3,14 +3,16 @@ import requests
 from Admin import Admin
 from Dentista import Dentista
 from Paciente import Paciente
-from Pagamento import Pagamento
+from Mensagem import Mensagem
+from datetime import datetime
 
 class Sistema:
+
+    db = "https://projetotestes-459ea-default-rtdb.firebaseio.com"
 
     def __init__(self, login=False, user=None):
         self.login = login
         self.user = user
-        self.db = "https://projetotestes-459ea-default-rtdb.firebaseio.com"
 
     def fazer_login(self,tipo_usuario,cpf,senha):
         busca = requests.get(f"{self.db}/{tipo_usuario}.json")
@@ -45,6 +47,35 @@ class Sistema:
         else:
             self.login = False
             print("Erro no Banco de Dados")
+            return False
+        
+    def notificar(self,cpf,mensagem):
+        if self.login:
+            mensagem = Mensagem(self.user.get_cpf(),cpf,mensagem)
+            mensagem = mensagem.__dict__
+            mensagem = json.dumps(mensagem)
+            response = requests.post(f"{self.db}/Mensagens/{cpf}.json", data=mensagem)
+            if response.ok:
+                return True
+            else:
+                print("Erro ao criar requisição de Pagamento. Código de status:", response.status_code)
+                return False
+        else:
+            print("Ação não é permitida.")
+            return False
+        
+    def ver_notificacoes(self):
+        busca = requests.get(f"{self.db}/Mensagens/{self.user.get_cpf()}.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                print(busca)
+                return True    
+            else:
+                print("Não há Notificações.")
+                return False
+        else:
+            print("Erro na Busca")
             return False
 
     def fazer_logout(self):
@@ -110,10 +141,7 @@ class Sistema:
         else:
             print("Ação não é permitida.")
             return False 
-
-
-
-#    def notificar(Mensagem):boolean
+        
 #    def registrar_usuario(Usuario):boolean
 #    def verificar_avaliacoes():list
 #    def visualizar_dentista(string):Dentista
@@ -127,7 +155,6 @@ class Sistema:
 #   buscar_atividade():list
 #   confirmar_consulta():boolean
 #   adicionar_anexo(Anexo):boolean
-#   notificar_paciente(Mensagem):boolean
 #   ver_agenda():Agenda
 
 # Paciente

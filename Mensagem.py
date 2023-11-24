@@ -1,12 +1,11 @@
 from datetime import datetime
 
 class Mensagem:
-    def __init__(self, id_mensagem="", cpf_emissor="", cpf_receptor="", texto=""):
-        self.id_mensagem = id_mensagem
+    def __init__(self,cpf_emissor="", cpf_receptor="", texto=""):
         self.cpf_emissor = cpf_emissor
         self.cpf_receptor = cpf_receptor
         self.texto = texto
-        self.data = datetime.now()
+        self.data = str(datetime.now())
 
     def get_id_mensagem(self):
         return self.id_mensagem
