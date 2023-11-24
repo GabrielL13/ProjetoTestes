@@ -3,8 +3,10 @@ import requests
 from Admin import Admin
 from Dentista import Dentista
 from Paciente import Paciente
+from Pagamento import Pagamento
 
 class Sistema:
+
     def __init__(self, login=False, user=None):
         self.login = login
         self.user = user
@@ -77,9 +79,40 @@ class Sistema:
             print("Ação não é permitida.")
             return False 
 
-#    def agendar_paciente(self):
-#    def reagendar_consulta():void
-#    def anexa_pagamento(Pagamento):boolean
+    def ver_solicitacoes(self):
+        if self.login and isinstance(self.user,Admin) :
+            resposta = self.user.ver_solicitacoes(self.user)
+            if isinstance(resposta,bool):
+                return resposta
+            else:
+                print(resposta)
+                return True
+        else:
+            print("Ação não é permitida.")
+            return False 
+
+    def agendar_consulta(self,data,cpf,nome_dentista,cpf_dentista,descricao,id_consulta):
+        if self.login and isinstance(self.user,Admin) :
+            if self.ver_solicitacoes():
+                resposta = self.user.agendar_consulta(self.user,cpf,data,nome_dentista,cpf_dentista,descricao,id_consulta)
+                return resposta
+            else:
+                print("Não Existe Requisições de Consulta.")
+                return False
+        else:
+            print("Ação não é permitida.")
+            return False 
+    
+    def anexa_pagamento(self,cpf,tipo_pagamento,valor,moeda,data):
+        if self.login and isinstance(self.user,Admin) :
+            resposta = self.user.anexa_pagamento(cpf,tipo_pagamento,str(valor),moeda,data)
+            return resposta
+        else:
+            print("Ação não é permitida.")
+            return False 
+
+
+
 #    def notificar(Mensagem):boolean
 #    def registrar_usuario(Usuario):boolean
 #    def verificar_avaliacoes():list
@@ -89,7 +122,6 @@ class Sistema:
 
 # Dentista
 
-#   solicitar_reagenda():void
 #   buscar_historico(string):list
 #   buscar_dados(string):Paciente
 #   buscar_atividade():list
@@ -100,7 +132,14 @@ class Sistema:
 
 # Paciente
 
-#   solicitar_consulta(): void
+    def solicitar_consulta(self):
+        if self.login and isinstance(self.user,Paciente) :
+            resposta = self.user.solicitar_consulta(self.user)
+            return resposta
+        else:
+            print("Ação não é permitida.")
+            return False 
+
 #   avaliar_atendimento(string) : void
 #   cancelar_consulta(string):void
 #   obter_valor_consulta(string):float

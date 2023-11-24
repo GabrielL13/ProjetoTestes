@@ -4,8 +4,9 @@ from Usuario import Usuario
 from Endereco import Endereco
 from Paciente import Paciente
 from Dentista import Dentista
-
-
+from Consulta import Consulta
+from datetime import datetime
+from Pagamento import Pagamento
 
 class Admin(Usuario):
 
@@ -78,10 +79,62 @@ class Admin(Usuario):
             print("Erro ao criar ficha de Dentista. Código de status:", response.status_code)
             return False
         
-    
-#    def agendar_paciente(self):
-#    def reagendar_consulta():void
-#    def anexa_pagamento(Pagamento):boolean
+    def ver_solicitacoes(self,user):
+        busca = requests.get(f"{self.db}/Requisição.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                return busca     
+            else:
+                return False
+        else:
+            print("Erro na Busca")
+            return False
+        
+    def agendar_consulta(self,user,cpf,data,nome_dentista,cpf_dentista,descricao,id_consulta):
+        busca = requests.get(f"{self.db}/Requisição.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                if cpf in busca:
+                    busca = busca[cpf]
+                    consulta = Consulta(id_consulta,str(data),nome_dentista,busca["nome"],cpf_dentista,busca["cpf"],descricao)
+                    consulta = consulta.__dict__
+                    consulta_json = json.dumps(consulta)
+                    response = requests.put(f"{self.db}/Consulta/{cpf_dentista}/{id_consulta}.json", data=consulta_json)
+                    if response.ok:
+                        if requests.delete(f"{self.db}/Requisição/{cpf}.json").ok :
+                            return True
+                        else:
+                            print("Falha ao retirar Requisição.")
+                            return False
+                    else:
+                        print("Erro ao criar ficha de Consulta. Código de status:", response.status_code)
+                        return False
+                else:
+                    print("Paciente não encontrado.")
+                    return False
+            else:
+                print("Requisição não existe.")
+                return False
+        else:
+            print("Erro na Busca")
+            return False
+        
+    def anexa_pagamento(self,cpf,tipo_pagamento,valor,moeda,data):
+        data = str(datetime.now()) 
+        pagamento = Pagamento(data+cpf,tipo_pagamento,valor,moeda,data)
+        pagamento = pagamento.__dict__
+        pagamento = json.dumps(pagamento)
+        response = requests.put(f"{self.db}/Pagamento/{cpf}.json", data=pagamento)
+        if response.ok:
+            return True
+        else:
+            print("Erro ao criar requisição de Pagamento. Código de status:", response.status_code)
+            return False
+
+
+
 #    def notificar(Mensagem):boolean
 #    def registrar_usuario(Usuario):boolean
 #    def verificar_avaliacoes():list
