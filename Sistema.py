@@ -12,9 +12,20 @@ class Sistema:
 
     def fazer_login(self,tipo_usuario,cpf,senha):
         busca = requests.get(f"{self.db}/{tipo_usuario}.json")
-        busca = user.json()
+        busca = busca.json()
+        if busca is None :
+            self.login = False
+            print("Erro Tipo de Usuario não existe.")
+            return False
+        if not cpf in busca :
+            self.login = False
+            print("Erro CPF de Usuario não existe.")
+            return False
         user = busca[cpf]
         if (user is not None):
+            if user["senha"] != senha :
+                print("Senha Incorreta")
+                return False
             if (tipo_usuario=="Admin"):
                 self.login = True
                 self.user = Admin(**user)
@@ -27,11 +38,11 @@ class Sistema:
                 self.login = True
                 self.user = Paciente(**user)
                 return True
-            return False
             print("Erro ao Logar")
+            return False
         else:
             self.login = False
-            print("Erro ao Logar")
+            print("Erro no Banco de Dados")
             return False
 
     def fazer_logout(self):

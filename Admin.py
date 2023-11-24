@@ -29,7 +29,7 @@ class Admin(Usuario):
         usuario_dict = usuario.__dict__
         usuario_dict['endereco'] = endereco_dict
         usuario_json = json.dumps(usuario_dict)
-        response = requests.post(f"{self.db}/Paciente/{cpf}.json", data=usuario_json)
+        response = requests.put(f"{self.db}/Paciente/{cpf}.json", data=usuario_json)
         if response.ok:
             return True
         else:
@@ -50,7 +50,7 @@ class Admin(Usuario):
         usuario_dict = usuario.__dict__
         usuario_dict['endereco'] = endereco_dict
         usuario_json = json.dumps(usuario_dict)
-        response = requests.post(f"{self.db}/Admin/{cpf}.json", data=usuario_json)
+        response = requests.put(f"{self.db}/Admin/{cpf}.json", data=usuario_json)
         if response.ok:
             return True
         else:
@@ -71,7 +71,7 @@ class Admin(Usuario):
         usuario_dict = usuario.__dict__
         usuario_dict['endereco'] = endereco_dict
         usuario_json = json.dumps(usuario_dict)
-        response = requests.post(f"{self.db}/Dentista/{cpf}.json", data=usuario_json)
+        response = requests.put(f"{self.db}/Dentista/{cpf}.json", data=usuario_json)
         if response.ok:
             return True
         else:
