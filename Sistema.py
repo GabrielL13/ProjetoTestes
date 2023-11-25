@@ -134,9 +134,9 @@ class Sistema:
             print("Ação não é permitida.")
             return False 
     
-    def anexa_pagamento(self,cpf,tipo_pagamento,valor,moeda,data):
+    def anexa_pagamento(self,cpf,valor,moeda,data):
         if self.login and isinstance(self.user,Admin) :
-            resposta = self.user.anexa_pagamento(cpf,tipo_pagamento,str(valor),moeda,data)
+            resposta = self.user.anexa_pagamento(cpf,str(valor),moeda,data)
             return resposta
         else:
             print("Ação não é permitida.")
@@ -154,8 +154,30 @@ class Sistema:
             print("Ação não é permitida.")
             return False
         
-#    def visualizar_dentista(string):Dentista
-#    def visualizar_paciente(string):Paciente
+    def visualizar_dentista(self,cpf):
+        if self.login and isinstance(self.user,Admin) :
+            resposta = self.user.visualizar_dentista(cpf)
+            if isinstance(resposta,bool):
+                return resposta
+            else:
+                print(resposta)
+                return True
+        else:
+            print("Ação não é permitida.")
+            return False
+        
+    def visualizar_paciente(self,cpf):
+        if self.login and (isinstance(self.user,Admin) or isinstance(self.user,Dentista)) :
+            resposta = self.user.visualizar_paciente(cpf)
+            if isinstance(resposta,bool):
+                return resposta
+            else:
+                print(resposta)
+                return True
+        else:
+            print("Ação não é permitida.")
+            return False
+        
 #    def atualizar_cadastro(Usuario):
 
 # Dentista
@@ -163,7 +185,6 @@ class Sistema:
 #   buscar_historico(string):list
 #   buscar_dados(string):Paciente
 #   buscar_atividade():list
-#   confirmar_consulta():boolean
 #   adicionar_anexo(Anexo):boolean
 #   ver_agenda():Agenda
 
@@ -185,6 +206,20 @@ class Sistema:
             print("Ação não é permitida.")
             return False 
 
-#   cancelar_consulta(string):void
-#   obter_valor_consulta(string):float
-#   realizar_pagamento(float):boolean 
+#   def cancelar_consulta(self,cpf):
+
+    def visualizar_pagamento(self):
+        if self.login and isinstance(self.user,Paciente) :
+            resposta = self.user.visualizar_pagamento(self.user.get_cpf())
+            return resposta
+        else:
+            print("Ação não é permitida.")
+            return False 
+    
+    def realizar_pagamento(self,pagamento,tipo_pagamento):
+        if self.login and isinstance(self.user,Paciente) :
+            resposta = self.user.realizar_pagamento(self.user.get_cpf(),pagamento,tipo_pagamento)
+            return resposta
+        else:
+            print("Ação não é permitida.")
+            return False 

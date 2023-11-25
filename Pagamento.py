@@ -1,9 +1,8 @@
 from datetime import datetime
 
 class Pagamento:
-    def __init__(self, id_pagamento="", tipo_pagamento="", valor=0.0, moeda="", data=None):
+    def __init__(self, id_pagamento="", valor=0.0, moeda="", data=None):
         self.id_pagamento = id_pagamento
-        self.tipo_pagamento = tipo_pagamento
         self.valor = valor
         self.moeda = moeda
         self.data = data if data else datetime.now()

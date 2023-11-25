@@ -121,9 +121,9 @@ class Admin(Usuario):
             print("Erro na Busca")
             return False
         
-    def anexa_pagamento(self,cpf,tipo_pagamento,valor,moeda,data):
+    def anexa_pagamento(self,cpf,valor,moeda,data):
         data = str(datetime.now()) 
-        pagamento = Pagamento(data+cpf,tipo_pagamento,valor,moeda,data)
+        pagamento = Pagamento(data+cpf,valor,moeda,data)
         pagamento = pagamento.__dict__
         pagamento = json.dumps(pagamento)
         response = requests.put(f"{self.db}/Pagamento/{cpf}.json", data=pagamento)
@@ -145,5 +145,28 @@ class Admin(Usuario):
             print("Erro na Busca")
             return False
         
-#    def visualizar_dentista(string):Dentista
-#    def visualizar_paciente(string):Paciente
+    def visualizar_dentista(self,cpf):
+        busca = requests.get(f"{self.db}/Dentista/{cpf}.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                return busca     
+            else:
+                print("Dentista não existe.")
+                return False
+        else:
+            print("Erro na Busca")
+            return False
+        
+    def visualizar_paciente(self,cpf):
+        busca = requests.get(f"{self.db}/Paciente/{cpf}.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                return busca     
+            else:
+                print("Paciente não existe.")
+                return False
+        else:
+            print("Erro na Busca")
+            return False

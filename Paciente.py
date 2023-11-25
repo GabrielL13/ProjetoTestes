@@ -34,7 +34,39 @@ class Paciente(Usuario):
             print("Erro ao criar Feedback. Código de status:", response.status_code,response.text)
             return False
         
+    def visualizar_pagamento(self,cpf):
+        busca = requests.get(f"{self.db}/Pagamento/{cpf}.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                return busca    
+            else:
+                print("Não existe Pagamentos pendentes.")
+                return False
+        else:
+            print("Erro na Busca")
+            return False
         
+    def realizar_pagamento(self,cpf,pagamento,tipo_pagamento):
+        busca = self.visualizar_pagamento(cpf)
+        if float(busca["valor"]) > float(pagamento) :
+            print("Valor Insuficiente")
+            return False
+        else:
+            deletar = requests.delete(f"{self.db}/Pagamento/{cpf}.json")
+            if deletar.ok:
+                busca["status_pagamento"] == "True"
+                busca.update({"tipo_pagamento":tipo_pagamento})
+                busca = json.dumps(busca)
+                response = requests.post(f"{self.db}/Historico/{cpf}.json", data=busca)
+                if response.ok:
+                    print("Pagamento realizado com sucesso.")
+                    return True
+                else:
+                    print("Erro adicionar Pagamento no Histórico. Código de status:", response.status_code,response.text)
+                    return False    
+            else:
+                print("Erro no Pagamento")
+                return False
+
 #   cancelar_consulta(string):void
-#   obter_valor_consulta(string):float
-#   realizar_pagamento(float):boolean
