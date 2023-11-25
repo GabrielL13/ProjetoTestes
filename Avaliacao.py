@@ -1,11 +1,10 @@
 from datetime import datetime
 
 class Avaliacao:
-    def __init__(self, id_avaliacao="", texto="", nota=0):
-        self.id_avaliacao = id_avaliacao
+    def __init__(self, texto="", nota="0"):
         self.texto = texto
         self.nota = nota
-        self.data = datetime.now()
+        self.data = str(datetime.now())
 
     def get_id_avaliacao(self):
         return self.id_avaliacao

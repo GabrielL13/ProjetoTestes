@@ -2,6 +2,7 @@ import requests
 import json
 from Usuario import Usuario
 from datetime import datetime,timezone
+from Avaliacao import Avaliacao
 
 class Paciente(Usuario):
 
@@ -20,11 +21,20 @@ class Paciente(Usuario):
         else:
             print("Erro ao criar Requisição. Código de status:",pedido.status_code," ",pedido.text)
             return False
-
-#   avaliar_atendimento(string) : void
+    
+    def avaliar_atendimento(self,nota,texto):
+        avaliacao = Avaliacao(texto,nota)
+        avaliacao = avaliacao.__dict__
+        avaliacao = json.dumps(avaliacao)
+        print(avaliacao)
+        response = requests.post(f"{self.db}/Avaliacao.json", data=avaliacao)
+        if response.ok:
+            return True
+        else:
+            print("Erro ao criar Feedback. Código de status:", response.status_code,response.text)
+            return False
+        
+        
 #   cancelar_consulta(string):void
 #   obter_valor_consulta(string):float
-#   realizar_pagamento(float):boolean 
-#   ver_mensagens():list
-#   ver_mensagem(string):Mensagem
-#   realizar_avaliação(Avaliacao):bool
+#   realizar_pagamento(float):boolean

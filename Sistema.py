@@ -142,8 +142,18 @@ class Sistema:
             print("Ação não é permitida.")
             return False 
         
-#    def registrar_usuario(Usuario):boolean
-#    def verificar_avaliacoes():list
+    def verificar_avaliacoes(self):
+        if self.login and isinstance(self.user,Admin) :
+            resposta = self.user.verificar_avaliacoes()
+            if isinstance(resposta,bool):
+                return resposta
+            else:
+                print(resposta)
+                return True
+        else:
+            print("Ação não é permitida.")
+            return False
+        
 #    def visualizar_dentista(string):Dentista
 #    def visualizar_paciente(string):Paciente
 #    def atualizar_cadastro(Usuario):
@@ -167,10 +177,14 @@ class Sistema:
             print("Ação não é permitida.")
             return False 
 
-#   avaliar_atendimento(string) : void
+    def avaliar_atendimento(self,nota,texto):
+        if self.login and isinstance(self.user,Paciente) :
+            resposta = self.user.avaliar_atendimento(nota,texto)
+            return resposta
+        else:
+            print("Ação não é permitida.")
+            return False 
+
 #   cancelar_consulta(string):void
 #   obter_valor_consulta(string):float
 #   realizar_pagamento(float):boolean 
-#   ver_mensagens():list
-#   ver_mensagem(string):Mensagem
-#   realizar_avaliação(Avaliacao):bool

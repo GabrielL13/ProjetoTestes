@@ -132,12 +132,18 @@ class Admin(Usuario):
         else:
             print("Erro ao criar requisição de Pagamento. Código de status:", response.status_code)
             return False
-
-
-
-#    def notificar(Mensagem):boolean
-#    def registrar_usuario(Usuario):boolean
-#    def verificar_avaliacoes():list
+        
+    def verificar_avaliacoes(self):
+        busca = requests.get(f"{self.db}/Avaliacao.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                return busca     
+            else:
+                return False
+        else:
+            print("Erro na Busca")
+            return False
+        
 #    def visualizar_dentista(string):Dentista
 #    def visualizar_paciente(string):Paciente
-#    def atualizar_cadastro(Usuario):
