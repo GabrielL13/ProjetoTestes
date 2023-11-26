@@ -11,11 +11,11 @@ class Paciente(Usuario):
     def __init__(self,nome, senha, cpf, telefone, rg, cartaoSus,endereco,data_de_nascimento,estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais):
         super().__init__(nome, senha, cpf, telefone, rg, cartaoSus,endereco, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
         
-    def solicitar_consulta(self,user):
+    def solicitar_consulta(self):
         data = str(datetime.now())
-        dado = {"data":data,"cpf":user.get_cpf(),"nome":user.get_nome()}
+        dado = {"data":data,"cpf":self.get_cpf(),"nome":self.get_nome()}
         dado = json.dumps(dado)
-        pedido = requests.put(f"{self.db}/Requisição/{user.cpf}.json", data=dado)
+        pedido = requests.put(f"{self.db}/Requisição/{self.get_cpf()}.json", data=dado)
         if pedido.ok:
             return True
         else:
@@ -34,8 +34,8 @@ class Paciente(Usuario):
             print("Erro ao criar Feedback. Código de status:", response.status_code,response.text)
             return False
         
-    def visualizar_pagamento(self,cpf):
-        busca = requests.get(f"{self.db}/Pagamento/{cpf}.json")
+    def visualizar_pagamento(self):
+        busca = requests.get(f"{self.db}/Pagamento/{self.get_cpf()}.json")
         if busca.ok:
             busca = busca.json()
             if (busca is not None):
@@ -47,18 +47,18 @@ class Paciente(Usuario):
             print("Erro na Busca")
             return False
         
-    def realizar_pagamento(self,cpf,pagamento,tipo_pagamento):
-        busca = self.visualizar_pagamento(cpf)
+    def realizar_pagamento(self,pagamento,tipo_pagamento):
+        busca = self.visualizar_pagamento()
         if float(busca["valor"]) > float(pagamento) :
             print("Valor Insuficiente")
             return False
         else:
-            deletar = requests.delete(f"{self.db}/Pagamento/{cpf}.json")
+            deletar = requests.delete(f"{self.db}/Pagamento/{self.get_cpf()}.json")
             if deletar.ok:
                 busca["status_pagamento"] == "True"
                 busca.update({"tipo_pagamento":tipo_pagamento})
                 busca = json.dumps(busca)
-                response = requests.post(f"{self.db}/Historico/{cpf}.json", data=busca)
+                response = requests.post(f"{self.db}/Historico/{self.get_cpf()}/Pagamentos.json", data=busca)
                 if response.ok:
                     print("Pagamento realizado com sucesso.")
                     return True
@@ -68,5 +68,16 @@ class Paciente(Usuario):
             else:
                 print("Erro no Pagamento")
                 return False
-
-#   cancelar_consulta(string):void
+            
+    def ver_registros(self):
+        busca = requests.get(f"{self.db}/Historico/{self.get_cpf()}.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                return busca    
+            else:
+                print("Paciente não existe ou não possui histórico.")
+                return False
+        else:
+            print("Erro na Busca")
+            return False
