@@ -34,7 +34,7 @@ class Dentista(Usuario):
         anexo = Anexo(tipo,data,cpf,info,infoadd)
         anexo = anexo.__dict__
         anexo = json.dumps(anexo)
-        response = requests.post(f"{self.db}/Historico/{cpf}/Anexos/{data}.json", data=anexo)
+        response = requests.post(f"{self.db}/Historico/{cpf}/Anexos.json", data=anexo)
         if response.ok:
             return True
         else:
@@ -64,6 +64,27 @@ class Dentista(Usuario):
         else:
             print("Erro na Busca")
             return False
-
-#    def buscar_historico(string):list
-#    def arquivar_consulta(self):
+        
+    def arquivar_consulta(self,cpf):
+        busca = requests.get(f"{self.db}/Consulta/{self.get_cpf()}/{cpf}.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                deletar = requests.delete(f"{self.db}/Consulta/{self.get_cpf()}/{cpf}.json")
+                if deletar.ok:
+                    busca = json.dumps(busca)
+                    response = requests.post(f"{self.db}/Historico/{self.get_cpf()}/Consultas.json", data=busca)
+                    if response.ok:
+                        return True
+                    else:
+                        print("Erro adicionar Consulta no Histórico. Código de status:", response.status_code,response.text)
+                        return False    
+                else:
+                    print("Erro na Consulta")
+                    return False
+            else:
+                print("Não existe Consulta pendente.")
+                return False
+        else:
+            print("Erro na Busca")
+            return False

@@ -49,6 +49,8 @@ class Paciente(Usuario):
         
     def realizar_pagamento(self,pagamento,tipo_pagamento):
         busca = self.visualizar_pagamento()
+        if isinstance(busca,bool):
+            return False
         if float(busca["valor"]) > float(pagamento) :
             print("Valor Insuficiente")
             return False

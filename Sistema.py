@@ -137,6 +137,14 @@ class Sistema:
         else:
             print("Ação não é permitida.")
             return False 
+        
+    def atualizar_cadastro(self, nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais=None):
+        if self.login and isinstance(self.user,Admin) :
+            resposta = self.user.atualizar_cadastro(nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
+            return resposta
+        else:
+            print("Ação não é permitida.")
+            return False
 
     def ver_solicitacoes(self):
         if self.login and isinstance(self.user,Admin) :
@@ -214,7 +222,17 @@ class Sistema:
             print("Ação não é permitida.")
             return False
         
-    #    def atualizar_cadastro(Usuario):
+    def ver_agenda_dentista(self,cpf):
+        if self.login and  isinstance(self.user,Admin):
+            resposta = self.user.ver_agenda_dentista(cpf)
+            if isinstance(resposta,bool):
+                return resposta
+            else:
+                print(resposta)
+                return True
+        else:
+            print("Ação não é permitida.")
+            return False
             
 # Dentista e Admin
          

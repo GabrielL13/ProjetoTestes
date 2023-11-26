@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import requests
 import json
 from Usuario import Usuario
@@ -20,12 +21,11 @@ class Admin(Usuario):
         busca = requests.get(f"{self.db}/Paciente.json")
         busca = busca.json()
         if (busca is not None):
-            user = busca[cpf]
-            if (user is not None):
+            if (cpf in busca):
                 print("Ficha de Paciente já existe.")
-                return False       
+                return False      
         endereco = Endereco(rua, bairro, cidade, cep, numero, referencia)
-        usuario = Paciente(nome, senha, cpf, telefone, rg, cartaoSus,None, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
+        usuario = Paciente(nome, senha, cpf, telefone, rg, cartaoSus,None, str(data_de_nascimento), estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
         endereco_dict = endereco.to_dict()
         usuario_dict = usuario.__dict__
         usuario_dict['endereco'] = endereco_dict
@@ -41,12 +41,11 @@ class Admin(Usuario):
         busca = requests.get(f"{self.db}/Admin.json")
         busca = busca.json()
         if (busca is not None):
-            user = busca[cpf]
-            if (user is not None):
+            if (cpf in busca):
                 print("Ficha de Atendente já existe.")
                 return False       
         endereco = Endereco(rua, bairro, cidade, cep, numero, referencia)
-        usuario = Admin(nome, senha, cpf, telefone, rg, cartaoSus,None, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
+        usuario = Admin(nome, senha, cpf, telefone, rg, cartaoSus,None, str(data_de_nascimento), estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
         endereco_dict = endereco.to_dict()
         usuario_dict = usuario.__dict__
         usuario_dict['endereco'] = endereco_dict
@@ -62,12 +61,11 @@ class Admin(Usuario):
         busca = requests.get(f"{self.db}/Dentista.json")
         busca = busca.json()
         if (busca is not None):
-            user = busca[cpf]
-            if (user is not None):
+            if (cpf in busca):
                 print("Ficha de Dentista já existe.")
                 return False       
         endereco = Endereco(rua, bairro, cidade, cep, numero, referencia)
-        usuario = Dentista(crm,estado,nome, senha, cpf, telefone, rg, cartaoSus,None, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
+        usuario = Dentista(crm,estado,nome, senha, cpf, telefone, rg, cartaoSus,None, str(data_de_nascimento), estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
         endereco_dict = endereco.to_dict()
         usuario_dict = usuario.__dict__
         usuario_dict['endereco'] = endereco_dict
@@ -77,6 +75,31 @@ class Admin(Usuario):
             return True
         else:
             print("Erro ao criar ficha de Dentista. Código de status:", response.status_code)
+            return False
+        
+
+    def atualizar_cadastro(self,nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais=None):      
+        busca = requests.get(f"{self.db}/Paciente.json")
+        busca = busca.json()
+        if (busca is not None):
+            if (cpf in busca):
+                endereco = Endereco(rua, bairro, cidade, cep, numero, referencia)
+                usuario = Paciente(nome, senha, cpf, telefone, rg, cartaoSus,None, str(data_de_nascimento), estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
+                endereco_dict = endereco.to_dict()
+                usuario_dict = usuario.__dict__
+                usuario_dict['endereco'] = endereco_dict
+                usuario_json = json.dumps(usuario_dict)
+                response = requests.put(f"{self.db}/Paciente/{cpf}.json", data=usuario_json)
+                if response.ok:
+                    return True
+                else:
+                    print("Erro ao atualizar ficha de Paciente. Código de status:", response.status_code)
+                    return False
+            else:
+                print("Paciente não está registrado")
+                return False
+        else:
+            print("Erro na Busca")
             return False
         
     def ver_solicitacoes(self):
@@ -187,6 +210,21 @@ class Admin(Usuario):
                 return busca    
             else:
                 print("Paciente não existe ou não possui histórico.")
+                return False
+        else:
+            print("Erro na Busca")
+            return False
+        
+    def ver_agenda_dentista(self,cpf):
+        busca = requests.get(f"{self.db}/Consulta/{cpf}.json")
+        if busca.ok:
+            busca = busca.json()
+            if (busca is not None):
+                d_ordenado = sorted(busca.items(), key=lambda item: item[1]["data_horario"])
+                dicionario_ordenado = OrderedDict(d_ordenado)
+                return dict(dicionario_ordenado) 
+            else:
+                print("Paciente não existe.")
                 return False
         else:
             print("Erro na Busca")

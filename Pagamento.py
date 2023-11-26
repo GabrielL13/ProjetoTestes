@@ -5,7 +5,7 @@ class Pagamento:
         self.id_pagamento = id_pagamento
         self.valor = valor
         self.moeda = moeda
-        self.data = data if data else datetime.now()
+        self.data = data if data else str(datetime.now())
         self.status_pagamento = False
 
     def get_id_pagamento(self):
