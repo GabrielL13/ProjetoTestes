@@ -14,12 +14,6 @@ class Pagamento:
     def set_id_pagamento(self, id_pagamento):
         self.id_pagamento = id_pagamento
 
-    def get_tipo_pagamento(self):
-        return self.tipo_pagamento
-
-    def set_tipo_pagamento(self, tipo_pagamento):
-        self.tipo_pagamento = tipo_pagamento
-
     def get_valor(self):
         return self.valor
 
