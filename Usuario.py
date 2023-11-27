@@ -1,5 +1,5 @@
 class Usuario:
-    def __init__(self,nome, senha, cpf, telefone, rg, cartaoSus,endereco, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais):
+    def __init__(self,nome="", senha="", cpf="", telefone="", rg="", cartaoSus="",endereco=None, data_de_nascimento="", estado_civil="", tipo_sanguineo="", nacionalidade="", sexo="", info_adicionais=""):
         self.nome = nome
         self.senha = senha
         self.cpf = cpf

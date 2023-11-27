@@ -135,8 +135,17 @@ class Admin(Usuario):
                         print("Erro ao criar ficha de Consulta. Código de status:", response.status_code)
                         return False
                 else:
-                    print("Paciente não encontrado.")
-                    return False
+                    print("Requisição não encontrada.")
+                    consulta = Consulta(str(data),nome_dentista,"Sem Cadastro",cpf_dentista,cpf,descricao)
+                    consulta = consulta.__dict__
+                    consulta_json = json.dumps(consulta)
+                    response = requests.put(f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json", data=consulta_json)
+                    if response.ok:
+                        if requests.delete(f"{self.db}/Requisição/{cpf}.json").ok :
+                            return True
+                        else:
+                            print("Falha ao retirar Requisição.")
+                            return False
             else:
                 print("Requisição não existe.")
                 return False

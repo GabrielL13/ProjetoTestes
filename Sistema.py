@@ -19,16 +19,20 @@ class Sistema:
         busca = busca.json()
         if busca is None :
             self.login = False
+            self.user = None
             print("Erro Tipo de Usuario não existe.")
             return False
         if not cpf in busca :
             self.login = False
+            self.user = None
             print("Erro CPF de Usuario não existe.")
             return False
         user = busca[cpf]
         if (user is not None):
             if user["senha"] != senha :
                 print("Senha Incorreta")
+                self.user = None
+                self.login = False
                 return False
             if (tipo_usuario=="Admin"):
                 self.login = True
@@ -43,9 +47,12 @@ class Sistema:
                 self.user = Paciente(**user)
                 return True
             print("Erro ao Logar")
+            self.user = None
+            self.login = False
             return False
         else:
             self.login = False
+            self.user = None
             print("Erro no Banco de Dados")
             return False
         
@@ -289,9 +296,9 @@ class Sistema:
             resposta = self.user.cancelar_consulta(cpf)
             if resposta:
                 self.notificar(cpf,"Consulta Cancelada, solicite um novo agendamento.")
-                return resposta
+                return True
             else:
-                return resposta
+                return False
         else:
             print("Ação não é permitida.")
             return False

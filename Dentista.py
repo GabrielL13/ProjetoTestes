@@ -23,7 +23,7 @@ class Dentista(Usuario):
                 dicionario_ordenado = OrderedDict(d_ordenado)
                 return dict(dicionario_ordenado) 
             else:
-                print("Paciente não existe.")
+                print("Agenda Não Existe")
                 return False
         else:
             print("Erro na Busca")
@@ -41,15 +41,31 @@ class Dentista(Usuario):
             print("Erro ao criar Anexo. Código de status:", response.status_code)
             return False
 
-    def cancelar_consulta(self,cpf):
+    import requests
+
+    def cancelar_consulta(self, cpf):
         try:
-            deletar = requests.delete(f"{self.db}/Consulta/{self.get_cpf()}/{cpf}.json")
+            url = f"{self.db}/Consulta/{self.get_cpf()}/{cpf}.json"
+            
+            # Verifica se a consulta existe fazendo uma requisição GET
+            busca = requests.get(url)
+            if busca.ok:
+                busca = busca.json()
+                if (busca is None):
+                        print(f"Erro ao procurar consulta.")
+                        return False
+            # Se a consulta existe, então faz a requisição DELETE
+            deletar = requests.delete(url)
+            
             if deletar.ok:
+                print(f"A consulta {cpf} foi deletada com sucesso.")
                 return True
             else:
+                print(f"Erro ao tentar deletar a consulta {cpf}.")
                 return False
-        except:
-            print("Erro ao deletar consulta.")
+
+        except requests.exceptions.RequestException as e:
+            print(f"Erro de requisição ao tentar deletar a consulta {cpf}: {e}")
             return False
         
     def ver_historico_paciente(self,cpf):
