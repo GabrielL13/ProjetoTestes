@@ -5,7 +5,7 @@ from Admin import Admin
 from Dentista import Dentista 
 from Paciente import Paciente
 
-class TestSistema():
+class TestIntegracaoSistema():
 
     sistema = Sistema()
     sistema.login = True
@@ -210,81 +210,107 @@ class TestSistema():
                                                tipo_sanguineo="O+", nacionalidade="paisteste", sexo="sexoteste0",
                                                info_adicionais="add")
         
-    """
+
     # CNT4 - Solicitar Agendamento de Consultas
     @pytest.mark.run(order=4)
     def test_solicitacao_consulta(self):
+        self.sistema.login = True
         
-        # CT1 - Visualizar solicitações sem elas existirem
-        assert not self.admin.ver_solicitacoes()
+        # CT1 - Visualizar solicitações sem elas 
+        self.sistema.user = Admin()
+        assert not self.sistema.ver_solicitacoes()
 
         # CT2 - Solicitação do Paciente de uma Consulta
-        assert self.paciente.solicitar_consulta()
+        self.sistema.user = Paciente()
+        assert self.sistema.solicitar_consulta()
 
         # CT3 - Visualizar solicitações com sucesso
-        assert self.admin.ver_solicitacoes()
+        self.sistema.user = Admin()
+        assert self.sistema.ver_solicitacoes()
+
+        # CT4 - Solicitação sem estar logado
+        self.sistema.user = Paciente()
+        self.sistema.login = False
+        assert not self.sistema.solicitar_consulta()
+
+        # CT5 - Solicitação sem ser Paciente
+        self.sistema.user = Admin()
+        self.sistema.login = True
+        assert not self.sistema.solicitar_consulta()
 
     
     # CNT5 - Agendamento de Consultas
     @pytest.mark.run(order=5)
     def test_manipular_consulta(self):
+        self.sistema.login = True
+        self.sistema.user = Admin()
 
         # CT1 - Marcar uma consulta com solicitação pré-cadastrada
-        self.admin.criar_ficha(nome="TesteConsulta", cpf="admin", senha="teste123",
+        self.sistema.criar_ficha(nome="TesteConsulta", cpf="admin", senha="teste123",
                                                telefone="12345678", rg="1234567", cartaoSus="sus123",
                                                rua="ruateste", bairro="bairroteste", cidade="cidadeteste",
                                                numero="1", cep="cep123", referencia="semref",
                                                data_de_nascimento=datetime.now(), estado_civil="estado",
                                                tipo_sanguineo="O+", nacionalidade="paisteste", sexo="sexoteste0",
                                                info_adicionais="add")
-        assert self.admin.agendar_consulta(cpf="admin",data=datetime.now()
+        assert self.sistema.agendar_consulta(cpf="admin",data=datetime.now()
                                     ,nome_dentista="admin",cpf_dentista="admin",descricao="consulta_teste1")
         
         # CT2 - Tentativa de marcar consulta sem cadastro
-        assert not self.admin.agendar_consulta(cpf="9431031",data=datetime.now()
+        assert not self.sistema.agendar_consulta(cpf="9431031",data=datetime.now()
                                     ,nome_dentista="admin",cpf_dentista="admin",descricao="consulta_teste1")
         
         # CT3 - Tentativa de marcar consulta que já existe (reagendamento)
-        assert self.admin.agendar_consulta(cpf="admin",data=datetime.now()
+        assert self.sistema.agendar_consulta(cpf="admin",data=datetime.now()
                                     ,nome_dentista="admin",cpf_dentista="admin",descricao="reagentamento")
         
         # CT4 - Tentativa de marcar consulta sem solicitação prévia
-        assert self.admin.agendar_consulta(cpf="teste",data=datetime.now()
+        assert self.sistema.agendar_consulta(cpf="teste",data=datetime.now()
                                     ,nome_dentista="teste",cpf_dentista="teste",descricao="reagentamento")
         
         # CT5 - Cancelar consulta existente
-        assert self.admin.cancelar_consulta_admin(cpf="teste",cpf_dentista="teste")
-        assert self.dentista.cancelar_consulta(cpf="admin")
+        assert self.sistema.cancelar_consulta_admin(cpf="teste",cpf_dentista="teste")
+        self.sistema.user = Dentista()
+        assert self.sistema.cancelar_consulta(cpf="admin")
 
         # CT6 - Cancelar consulta inexistente de um dentista inexistente
-        assert not self.admin.cancelar_consulta_admin(cpf="-10390193",cpf_dentista="admin")
+        self.sistema.user = Admin()
+        assert not self.sistema.cancelar_consulta_admin(cpf="-10390193",cpf_dentista="admin")
 
         # CT7 - Cancelar consulta inexistente de um dentista paciente
-        assert not self.admin.cancelar_consulta_admin(cpf="teste",cpf_dentista="-090909")
+        assert not self.sistema.cancelar_consulta_admin(cpf="teste",cpf_dentista="-090909")
 
-
+    
     # CNT6 - Verificar avaliação de atendimento
     @pytest.mark.run(order=6)
     def test_verificar_avaliacoes(self):
+        self.sistema.login = True
+        self.sistema.user = Paciente()
 
         # CT1 - Fazer Avaliação com sucesso
-        assert self.paciente.avaliar_atendimento(nota=5,texto="avaliação teste 1")
-        assert self.paciente.avaliar_atendimento(nota=4.5,texto="avaliação teste 2")
-        assert self.paciente.avaliar_atendimento(nota="5",texto="avaliação teste 3")
+        assert self.sistema.avaliar_atendimento(nota=5,texto="avaliação teste 1")
+        assert self.sistema.avaliar_atendimento(nota=4.5,texto="avaliação teste 2")
+        assert self.sistema.avaliar_atendimento(nota="5",texto="avaliação teste 3")
 
-        # CT2 - Visualizar avaliações registradas 
-        assert not isinstance(self.admin.verificar_avaliacoes(),bool)
-
-        # CT3 - Deletar as avaliações com sucesso
-        assert self.admin.deletar_avaliacoes()
-
-        # CT4 - Deletar as avaliações sem existirem
-        assert not self.admin.deletar_avaliacoes()
-
-        # CT5 - Verificar avaliações sem ter recebido nenhuma
-        assert not self.admin.verificar_avaliacoes()
-
+        # CT2 - Fazer Avaliação sem estar logado
+        self.sistema.login = False
+        assert not self.sistema.avaliar_atendimento(nota="boa",texto="avaliação teste 4")
     
+        # CT3 - Visualizar avaliações registradas
+        self.sistema.user = Admin()
+        self.sistema.login = True
+        assert self.sistema.verificar_avaliacoes()
+
+        # CT4 - Deletar as avaliações com sucesso
+        assert self.sistema.deletar_avaliacoes()
+
+        # CT5 - Deletar as avaliações sem existirem
+        assert not self.sistema.deletar_avaliacoes()
+
+        # CT6 - Verificar avaliações sem ter recebido nenhuma
+        assert not self.sistema.verificar_avaliacoes()
+
+    """
     # CNT7 - Visualizar informações de paciente
     @pytest.mark.run(order=9) 
     def test_visualizar_informacoes_paciente(self):

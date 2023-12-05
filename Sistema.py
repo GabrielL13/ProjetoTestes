@@ -185,12 +185,8 @@ class Sistema:
 
     def agendar_consulta(self,data,cpf,nome_dentista,cpf_dentista,descricao):
         if self.login and isinstance(self.user,Admin) :
-            if self.ver_solicitacoes():
                 resposta = self.user.agendar_consulta(cpf,data,nome_dentista,cpf_dentista,descricao)
                 return resposta
-            else:
-                print("Não Existe Requisições de Consulta.")
-                return False
         else:
             print("Ação não é permitida.")
             return False 

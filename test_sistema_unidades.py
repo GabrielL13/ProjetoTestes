@@ -4,7 +4,7 @@ from Paciente import Paciente
 from Dentista import Dentista
 from datetime import datetime
 
-class TestSistema():
+class TestUnidadeSistema():
 
     admin = Admin()
     paciente = Paciente()
