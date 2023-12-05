@@ -30,15 +30,25 @@ class Dentista(Usuario):
             return False
         
     def adicionar_anexo(self,cpf,tipo,info,infoadd):
-        data = str(datetime.now())
-        anexo = Anexo(tipo,data,cpf,info,infoadd)
-        anexo = anexo.__dict__
-        anexo = json.dumps(anexo)
-        response = requests.post(f"{self.db}/Historico/{cpf}/Anexos.json", data=anexo)
-        if response.ok:
-            return True
+        busca = requests.get(f"{self.db}/Paciente.json")
+        busca = busca.json()
+        if busca is not None:
+            if cpf in busca:
+                data = str(datetime.now())
+                anexo = Anexo(tipo,data,cpf,info,infoadd)
+                anexo = anexo.__dict__
+                anexo = json.dumps(anexo)
+                response = requests.post(f"{self.db}/Historico/{cpf}/Anexos.json", data=anexo)
+                if response.ok:
+                    return True
+                else:
+                    print("Erro ao criar Anexo. Código de status:", response.status_code)
+                    return False
+            else:
+                print("Paciente não está registrado")
+                return False
         else:
-            print("Erro ao criar Anexo. Código de status:", response.status_code)
+            print("Não tem pacientes registrados.")
             return False
 
     def cancelar_consulta(self, cpf):

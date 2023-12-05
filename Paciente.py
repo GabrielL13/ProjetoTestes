@@ -47,7 +47,10 @@ class Paciente(Usuario):
             print("Erro na Busca")
             return False
         
-    def realizar_pagamento(self,pagamento,tipo_pagamento):
+    def realizar_pagamento(self,pagamento,tipo_pagamento=None):
+        if tipo_pagamento is None:
+            print("Selecione o tipo de Pagamento")
+            return False
         busca = self.visualizar_pagamento()
         if isinstance(busca,bool):
             return False

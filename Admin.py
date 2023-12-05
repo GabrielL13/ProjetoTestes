@@ -163,12 +163,9 @@ class Admin(Usuario):
                     consulta = consulta.__dict__
                     consulta_json = json.dumps(consulta)
                     response = requests.put(f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json", data=consulta_json)
-                    if response.ok:
-                        if requests.delete(f"{self.db}/Requisicao/{cpf}.json").ok :
-                            return True
-                        else:
-                            print("Falha ao retirar Requisição.")
-                            return False
+                    response2 = requests.delete(f"{self.db}/Requisicao/{cpf}.json")
+                    if response.ok and response2.ok:
+                        return True
                     else:
                         print("Erro ao criar ficha de Consulta. Código de status:", response.status_code)
                         return False
@@ -182,14 +179,12 @@ class Admin(Usuario):
         
     def cancelar_consulta_admin(self, cpf,cpf_dentista):
         try:
-            url = f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json"
-            busca = requests.get(url)
-            if busca.ok:
-                busca = busca.json()
-                if (busca is None):
-                        print(f"Erro ao procurar consulta.")
-                        return False
-            deletar = requests.delete(url)
+            busca = requests.get(f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json")
+            busca = busca.json()
+            if (busca is None):
+                    print(f"Erro ao procurar consulta.")
+                    return False
+            deletar = requests.delete(f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json")
             if deletar.ok:
                 print(f"A consulta {cpf} foi deletada com sucesso.")
                 return True
@@ -201,17 +196,29 @@ class Admin(Usuario):
             print(f"Erro de requisição ao tentar deletar a consulta {cpf}: {e}")
             return False
         
-    def anexa_pagamento(self,cpf,valor,moeda,data):
-        data = str(datetime.now())
-        pagamento = Pagamento(data+cpf,valor,moeda,data)
-        pagamento = pagamento.__dict__
-        pagamento = json.dumps(pagamento)
-        response = requests.put(f"{self.db}/Pagamento/{cpf}.json", data=pagamento)
-        if response.ok:
-            return True
+    def anexa_pagamento(self,cpf,valor,moeda,data=None):
+        if data is None:
+            data = str(datetime.now())
+        busca = requests.get(f"{self.db}/Paciente.json")
+        busca = busca.json()
+        if busca is not None:
+            if cpf in busca:
+                pagamento = Pagamento(data+cpf,valor,moeda,data)
+                pagamento = pagamento.__dict__
+                pagamento = json.dumps(pagamento)
+                response = requests.put(f"{self.db}/Pagamento/{cpf}.json", data=pagamento)
+                if response.ok:
+                    return True
+                else:
+                    print("Erro ao criar requisição de Pagamento. Código de status:", response.status_code)
+                    return False
+            else:
+                    print("Paciente não está registrado")
+                    return False
         else:
-            print("Erro ao criar requisição de Pagamento. Código de status:", response.status_code)
+            print("Não tem pacientes registrados.")
             return False
+
         
     def verificar_avaliacoes(self):
         busca = requests.get(f"{self.db}/Avaliacao.json")
@@ -226,12 +233,16 @@ class Admin(Usuario):
             return False
         
     def deletar_avaliacoes(self):
-        busca = requests.delete(f"{self.db}/Avaliacao.json")
-        if busca.ok:  
-            return True
-        else:
-            print("Erro na Busca")
+        if isinstance(self.verificar_avaliacoes(),bool):
+            print("Não tem Avaliações")
             return False
+        else:
+            busca = requests.delete(f"{self.db}/Avaliacao.json")
+            if busca.ok:  
+                return True
+            else:
+                print("Erro na Busca")
+                return False
         
     def visualizar_dentista(self,cpf):
         busca = requests.get(f"{self.db}/Dentista/{cpf}.json")

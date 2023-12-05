@@ -177,7 +177,7 @@ class Sistema:
             print("Ação não é permitida.")
             return False 
     
-    def anexa_pagamento(self,cpf,valor,moeda,data):
+    def anexa_pagamento(self,cpf,valor,moeda,data=None):
         if self.login and isinstance(self.user,Admin) :
             resposta = self.user.anexa_pagamento(cpf,str(valor),moeda,data)
             return resposta
