@@ -121,7 +121,13 @@ class Sistema:
         
 # Ações Unicas dos Atendentes ou Administradores
         
-    def criar_ficha(self, nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais=None):
+    def criar_ficha(self, nome=None, senha=None, cpf=None, telefone=None, rg=None, cartaoSus=None, rua=None,
+                    bairro=None, cidade=None, cep=None, numero=None, referencia=None, data_de_nascimento=None,
+                    estado_civil=None, tipo_sanguineo=None, nacionalidade=None, sexo=None, info_adicionais=None):
+        if None in (nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia,
+                    data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo):
+            print("Preencha todos os campos obrigatórios.")
+            return False
         if self.login and isinstance(self.user,Admin) :
             resposta = self.user.criar_ficha(nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
             return resposta
@@ -129,7 +135,13 @@ class Sistema:
             print("Ação não é permitida.")
             return False
 
-    def criar_ficha_dentista(self,crm,estado,nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais=None):
+    def criar_ficha_dentista(self,crm=None,estado=None,nome=None, senha=None, cpf=None, telefone=None, rg=None, cartaoSus=None, rua=None,
+                    bairro=None, cidade=None, cep=None, numero=None, referencia=None, data_de_nascimento=None,
+                    estado_civil=None, tipo_sanguineo=None, nacionalidade=None, sexo=None, info_adicionais=None):
+        if None in (crm , estado,nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia,
+                    data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo):
+            print("Preencha todos os campos obrigatórios.")
+            return False
         if self.login and isinstance(self.user,Admin) :
             resposta = self.user.criar_ficha_dentista(crm,estado,nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
             return resposta
@@ -137,7 +149,13 @@ class Sistema:
             print("Ação não é permitida.")
             return False
         
-    def criar_ficha_atendente(self,nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais=None):
+    def criar_ficha_atendente(self, nome=None, senha=None, cpf=None, telefone=None, rg=None, cartaoSus=None, rua=None,
+                    bairro=None, cidade=None, cep=None, numero=None, referencia=None, data_de_nascimento=None,
+                    estado_civil=None, tipo_sanguineo=None, nacionalidade=None, sexo=None, info_adicionais=None):
+        if None in (nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia,
+                    data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo):
+            print("Preencha todos os campos obrigatórios.")
+            return False
         if self.login and isinstance(self.user,Admin) :
             resposta = self.user.criar_ficha_atendente(nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
             return resposta
