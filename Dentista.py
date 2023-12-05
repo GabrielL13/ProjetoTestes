@@ -9,7 +9,7 @@ class Dentista(Usuario):
 
     db = "https://projetotestes-459ea-default-rtdb.firebaseio.com"
 
-    def __init__(self,crm,estado,nome,senha,cpf,telefone,rg,cartaoSus,endereco,data_de_nascimento,estado_civil,tipo_sanguineo,nacionalidade,sexo,info_adicionais,):
+    def __init__(self,crm="",estado="",nome="DentistaAdmin",senha="",cpf="admin",telefone="",rg="",cartaoSus="",endereco="",data_de_nascimento="",estado_civil="",tipo_sanguineo="",nacionalidade="",sexo="",info_adicionais=""):
         super().__init__(nome,senha,cpf,telefone,rg,cartaoSus,endereco,data_de_nascimento,estado_civil,tipo_sanguineo,nacionalidade,sexo,info_adicionais)
         self.crm = crm
         self.estado = estado
@@ -40,8 +40,6 @@ class Dentista(Usuario):
         else:
             print("Erro ao criar Anexo. Código de status:", response.status_code)
             return False
-
-    import requests
 
     def cancelar_consulta(self, cpf):
         try:

@@ -240,6 +240,19 @@ class Sistema:
         else:
             print("Ação não é permitida.")
             return False
+        
+    def cancelar_consulta_admin(self,cpf,cpf_dentista):
+        if self.login and isinstance(self.user,Admin) :
+            resposta = self.user.cancelar_consulta_admin(cpf,cpf_dentista)
+            if resposta:
+                self.notificar(cpf,"Consulta Cancelada, solicite um novo agendamento.")
+                self.notificar(cpf_dentista,"Consulta do paciente "+cpf+" foi Cancelada.")
+                return True
+            else:
+                return False
+        else:
+            print("Ação não é permitida.")
+            return False
             
 # Dentista e Admin
          

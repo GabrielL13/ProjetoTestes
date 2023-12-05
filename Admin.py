@@ -13,11 +13,16 @@ class Admin(Usuario):
 
     db = "https://projetotestes-459ea-default-rtdb.firebaseio.com"
 
-    def __init__(self,nome, senha, cpf, telefone, rg, cartaoSus, endereco, data_de_nascimento,estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais):
+    def __init__(self,nome="Admin", senha="", cpf="admin", telefone="", rg="", cartaoSus="", endereco=None, data_de_nascimento="",estado_civil="", tipo_sanguineo="", nacionalidade="", sexo="", info_adicionais=""):
         super().__init__(nome, senha, cpf, telefone, rg, cartaoSus,endereco, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais)
         
-
-    def criar_ficha(self,nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais=None):
+    def criar_ficha(self, nome=None, senha=None, cpf=None, telefone=None, rg=None, cartaoSus=None, rua=None,
+                    bairro=None, cidade=None, cep=None, numero=None, referencia=None, data_de_nascimento=None,
+                    estado_civil=None, tipo_sanguineo=None, nacionalidade=None, sexo=None, info_adicionais=None):
+        if None in (nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia,
+                    data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo):
+            print("Preencha todos os campos obrigatórios.")
+            return False
         busca = requests.get(f"{self.db}/Paciente.json")
         busca = busca.json()
         if (busca is not None):
@@ -37,7 +42,13 @@ class Admin(Usuario):
             print("Erro ao criar ficha de Paciente. Código de status:", response.status_code)
             return False
             
-    def criar_ficha_atendente(self, nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais):
+    def criar_ficha_atendente(self, nome=None, senha=None, cpf=None, telefone=None, rg=None, cartaoSus=None, rua=None,
+                    bairro=None, cidade=None, cep=None, numero=None, referencia=None, data_de_nascimento=None,
+                    estado_civil=None, tipo_sanguineo=None, nacionalidade=None, sexo=None, info_adicionais=None):
+        if None in (nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia,
+                    data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo):
+            print("Preencha todos os campos obrigatórios.")
+            return False
         busca = requests.get(f"{self.db}/Admin.json")
         busca = busca.json()
         if (busca is not None):
@@ -57,7 +68,13 @@ class Admin(Usuario):
             print("Erro ao criar ficha de Atendente. Código de status:", response.status_code)
             return False
         
-    def criar_ficha_dentista(self,crm,estado, nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais):
+    def criar_ficha_dentista(self,crm=None,estado=None,nome=None, senha=None, cpf=None, telefone=None, rg=None, cartaoSus=None, rua=None,
+                    bairro=None, cidade=None, cep=None, numero=None, referencia=None, data_de_nascimento=None,
+                    estado_civil=None, tipo_sanguineo=None, nacionalidade=None, sexo=None, info_adicionais=None):
+        if None in (crm , estado,nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia,
+                    data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo):
+            print("Preencha todos os campos obrigatórios.")
+            return False
         busca = requests.get(f"{self.db}/Dentista.json")
         busca = busca.json()
         if (busca is not None):
@@ -76,7 +93,6 @@ class Admin(Usuario):
         else:
             print("Erro ao criar ficha de Dentista. Código de status:", response.status_code)
             return False
-        
 
     def atualizar_cadastro(self,nome, senha, cpf, telefone, rg, cartaoSus, rua, bairro, cidade, cep, numero, referencia, data_de_nascimento, estado_civil, tipo_sanguineo, nacionalidade, sexo, info_adicionais=None):      
         busca = requests.get(f"{self.db}/Paciente.json")
@@ -103,7 +119,7 @@ class Admin(Usuario):
             return False
         
     def ver_solicitacoes(self):
-        busca = requests.get(f"{self.db}/Requisição.json")
+        busca = requests.get(f"{self.db}/Requisicao.json")
         if busca.ok:
             busca = busca.json()
             if (busca is not None):
@@ -115,10 +131,32 @@ class Admin(Usuario):
             return False
         
     def agendar_consulta(self,cpf,data,nome_dentista,cpf_dentista,descricao):
-        busca = requests.get(f"{self.db}/Requisição.json")
-        if busca.ok:
+        busca = self.ver_solicitacoes()
+        if isinstance(busca,bool):
+            print("Requisição não encontrada.")
+            busca = requests.get(f"{self.db}/Paciente.json")
             busca = busca.json()
             if (busca is not None):
+                if (cpf in busca):
+                    consulta = Consulta(str(data),nome_dentista,busca[cpf]["nome"],cpf_dentista,cpf,descricao)
+                    consulta = consulta.__dict__
+                    consulta_json = json.dumps(consulta)
+                    response = requests.put(f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json", data=consulta_json)
+                    if response.ok:
+                        return True
+                    else:
+                        print("Erro ao criar ficha de Consulta. Código de status:", response.status_code)
+                        return False
+                else:
+                    print("Paciente não está registrado")
+                    return False
+            else:
+                print("Não tem pacientes registrados.")
+                return False
+        else:
+            busca = requests.get(f"{self.db}/Paciente.json")
+            busca = busca.json()
+            if busca is not None:
                 if cpf in busca:
                     busca = busca[cpf]
                     consulta = Consulta(str(data),nome_dentista,busca["nome"],cpf_dentista,busca["cpf"],descricao)
@@ -126,7 +164,7 @@ class Admin(Usuario):
                     consulta_json = json.dumps(consulta)
                     response = requests.put(f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json", data=consulta_json)
                     if response.ok:
-                        if requests.delete(f"{self.db}/Requisição/{cpf}.json").ok :
+                        if requests.delete(f"{self.db}/Requisicao/{cpf}.json").ok :
                             return True
                         else:
                             print("Falha ao retirar Requisição.")
@@ -135,22 +173,32 @@ class Admin(Usuario):
                         print("Erro ao criar ficha de Consulta. Código de status:", response.status_code)
                         return False
                 else:
-                    print("Requisição não encontrada.")
-                    consulta = Consulta(str(data),nome_dentista,"Sem Cadastro",cpf_dentista,cpf,descricao)
-                    consulta = consulta.__dict__
-                    consulta_json = json.dumps(consulta)
-                    response = requests.put(f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json", data=consulta_json)
-                    if response.ok:
-                        if requests.delete(f"{self.db}/Requisição/{cpf}.json").ok :
-                            return True
-                        else:
-                            print("Falha ao retirar Requisição.")
-                            return False
+                    print("Paciente não está registrado")
+                    return False
             else:
-                print("Requisição não existe.")
+                print("Não tem pacientes registrados.")
                 return False
-        else:
-            print("Erro na Busca")
+               
+        
+    def cancelar_consulta_admin(self, cpf,cpf_dentista):
+        try:
+            url = f"{self.db}/Consulta/{cpf_dentista}/{cpf}.json"
+            busca = requests.get(url)
+            if busca.ok:
+                busca = busca.json()
+                if (busca is None):
+                        print(f"Erro ao procurar consulta.")
+                        return False
+            deletar = requests.delete(url)
+            if deletar.ok:
+                print(f"A consulta {cpf} foi deletada com sucesso.")
+                return True
+            else:
+                print(f"Erro ao tentar deletar a consulta {cpf}.")
+                return False
+
+        except requests.exceptions.RequestException as e:
+            print(f"Erro de requisição ao tentar deletar a consulta {cpf}: {e}")
             return False
         
     def anexa_pagamento(self,cpf,valor,moeda,data):
