@@ -435,3 +435,55 @@ class TestIntegracaoSistema():
         self.sistema.fazer_login(tipo_usuario="Dentista",cpf="teste",senha="teste123")
         assert  not self.sistema.ver_agenda_dentista(cpf="teste")
         assert  not self.sistema.ver_agenda()
+
+    # CNT11 - Realizar Login Sistema
+    @pytest.mark.run(order=11) 
+    def test_visualizar_login(self):
+        self.sistema = Sistema()
+
+        # CT1 - Realizar login com sucesso 
+        assert self.sistema.fazer_login(tipo_usuario="Dentista",cpf="teste",senha="teste123")
+        assert self.sistema.login
+        assert isinstance(self.sistema.user,Dentista)
+        assert self.sistema.fazer_login(tipo_usuario="Admin",cpf="teste",senha="teste123")
+        assert self.sistema.login
+        assert isinstance(self.sistema.user,Admin)
+        assert self.sistema.fazer_login(tipo_usuario="Paciente",cpf="teste",senha="teste123")
+        assert self.sistema.login
+        assert isinstance(self.sistema.user,Paciente)
+
+        # CT2 - Realizar login com senha errada
+        assert not self.sistema.fazer_login(tipo_usuario="Dentista",cpf="teste",senha="teste")
+        assert not self.sistema.login
+        assert not isinstance(self.sistema.user,Dentista)
+
+        # CT3 - Realizar login com tipo de usuario errado
+        assert not self.sistema.fazer_login(tipo_usuario="Admin",cpf="admin",senha="teste")
+        assert not self.sistema.login
+        assert not isinstance(self.sistema.user,Admin)
+
+        # CT4 - Realizar logout com sucesso
+        assert self.sistema.fazer_logout()
+        assert not self.sistema.login
+        assert not (isinstance(self.sistema.user,Dentista) or isinstance(self.sistema.user,Paciente) or isinstance(self.sistema.user,Admin))
+
+
+    # CNT12 - Realizar Notificações no Sistema
+    @pytest.mark.run(order=12) 
+    def test_notificar(self):
+        self.sistema.login = True
+        self.sistema.user = Paciente()
+
+        # CT2 - notificar usuário com sucesso 
+        assert self.sistema.notificar(cpf="admin",mensagem="Mensagem teste 1")
+
+        # CT1 - ver notificações com sucesso 
+        assert self.sistema.ver_notificacoes()
+
+        # CT1 - ver deletar com sucesso 
+        assert self.sistema.deletar_notificacoes()
+
+        # CT1 - ver notificações sem existir  
+        assert not self.sistema.ver_notificacoes()
+
+        
