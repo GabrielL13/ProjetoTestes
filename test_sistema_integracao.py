@@ -310,98 +310,128 @@ class TestIntegracaoSistema():
         # CT6 - Verificar avaliações sem ter recebido nenhuma
         assert not self.sistema.verificar_avaliacoes()
 
-    """
+    
     # CNT7 - Visualizar informações de paciente
     @pytest.mark.run(order=9) 
     def test_visualizar_informacoes_paciente(self):
-
+        
         # CT1 - Visualizar informações de um paciente existente
-        assert self.dentista.ver_historico_paciente(cpf="admin")
-        assert self.admin.ver_historico_paciente(cpf="admin")
-        assert self.paciente.ver_registros()
+        self.sistema.user = Dentista()
+        assert self.sistema.ver_historico_paciente(cpf="admin")
+        self.sistema.user = Admin()
+        assert self.sistema.ver_historico_paciente(cpf="admin")
+        self.sistema.user = Paciente()
+        assert self.sistema.ver_registros()
 
         # CT2 - Tentativa de visualizar paciente inexistente
-        assert not self.dentista.ver_historico_paciente(cpf="0129102")
-        assert not self.admin.ver_historico_paciente(cpf="af3f3f3")
+        self.sistema.user = Dentista()
+        assert not self.sistema.ver_historico_paciente(cpf="0129102")
+        self.sistema.user = Admin()
+        assert not self.sistema.ver_historico_paciente(cpf="af3f3f3")
 
         # CT3 - Tentativa de visualizar paciente sem historico
-        pacienteteste = Paciente(cpf="teste")
-        assert not self.dentista.ver_historico_paciente(cpf="teste")
-        assert not self.admin.ver_historico_paciente(cpf="teste")
-        assert not pacienteteste.ver_registros()
+        self.sistema.user = Dentista()
+        assert not self.sistema.ver_historico_paciente(cpf="teste")
+        self.sistema.user = Admin()
+        assert not self.sistema.ver_historico_paciente(cpf="teste")
+        self.sistema.fazer_login(tipo_usuario="Paciente",cpf="teste",senha="teste123")
+        assert not self.sistema.ver_registros()
 
     
     # CNT8 - Realização de Pagamento
     @pytest.mark.run(order=7)
     def test_realizar_pagamento(self):
+        self.sistema.user = Admin()
 
         # CT1 - Anexar pagamento com sucesso
-        assert self.admin.anexa_pagamento(cpf="admin",valor=50.75,moeda="real")
-        assert self.admin.anexa_pagamento(cpf="teste",valor="10",moeda="euro")
+        assert self.sistema.anexa_pagamento(cpf="admin",valor=50.75,moeda="real")
+        assert self.sistema.anexa_pagamento(cpf="teste",valor="10",moeda="euro")
 
         # CT2 - Tentativa de anexar pagamento para paciente inexistente
-        assert not self.admin.anexa_pagamento(cpf="-920313b",valor = 50,moeda = "dolar")
+        assert not self.sistema.anexa_pagamento(cpf="-920313b",valor = 50,moeda = "dolar")
+
+        # CT3 - Tentativa de anexar pagamento sem ser Atendente
+        self.sistema.user = Dentista()
+        assert not self.sistema.anexa_pagamento(cpf="teste",valor = 50,moeda = "dolar")
+        self.sistema.user = Paciente()
+        assert not self.sistema.anexa_pagamento(cpf="teste",valor = 50,moeda = "dolar")
 
         # CT3 - Tentativa de realizar pagamento sem ter valor suficiente
-        assert not self.paciente.realizar_pagamento(pagamento=50.1,tipo_pagamento="cartao de debito")
-        assert not self.paciente.realizar_pagamento(pagamento="50",tipo_pagamento="cartao de credito")
-        assert not self.paciente.realizar_pagamento(pagamento=50,tipo_pagamento="dinheiro")
+        assert not self.sistema.realizar_pagamento(pagamento=50.1,tipo_pagamento="cartao de debito")
+        assert not self.sistema.realizar_pagamento(pagamento="50",tipo_pagamento="cartao de credito")
+        assert not self.sistema.realizar_pagamento(pagamento=50,tipo_pagamento="dinheiro")
 
         # CT4 - Tentativa de realizar pagamento sem selecionar tipo de pagamento
-        assert not self.paciente.realizar_pagamento(pagamento=60)
+        assert not self.sistema.realizar_pagamento(pagamento=60)
 
-        # CT5 - Realizar pagamento com sucesso
-        assert self.paciente.realizar_pagamento(pagamento=51,tipo_pagamento="dinheiro")
+        # CT5 - Realizar pagamento sem estar logado
+        self.sistema.login = False
+        assert not self.sistema.realizar_pagamento(pagamento=51,tipo_pagamento="dinheiro")
 
-        # CT6 - Realizar pagamento que não existe 
-        assert not self.paciente.realizar_pagamento(pagamento=51,tipo_pagamento="fiado")
+        # CT6 - Realizar pagamento com sucesso
+        self.sistema.login = True
+        assert self.sistema.realizar_pagamento(pagamento=51,tipo_pagamento="dinheiro")
 
+        # CT7 - Realizar pagamento que não existe 
+        assert not self.sistema.realizar_pagamento(pagamento=51,tipo_pagamento="fiado")
 
+    
     # CNT9 - Manipulação Histórico paciente
     @pytest.mark.run(order=8)
     def test_adicionar_historico_paciente(self):
+        self.sistema.user = Dentista()
 
         # CT1 - Adicionar anexo ao paciente com sucesso
-        assert self.dentista.adicionar_anexo(cpf="admin",tipo="receita",info="remedio antibiótico",infoadd="12 em 12 horas")
+        assert self.sistema.adicionar_anexo(cpf="admin",tipo="receita",info="remedio antibiótico",infoadd="12 em 12 horas")
 
         # CT2 - Adicionar anexo ao paciente inexistente
-        assert not self.dentista.adicionar_anexo(cpf="-193932r",tipo="atestado",info="cirurgia odontológica",infoadd="15 dias de repouso")
+        assert not self.sistema.adicionar_anexo(cpf="-193932r",tipo="atestado",info="cirurgia odontológica",infoadd="15 dias de repouso")
+        
+        # CT2 - Adicionar anexo ao paciente inexistente
+        self.sistema.user = Admin()
+        assert not self.sistema.adicionar_anexo(cpf="teste",tipo="atestado",info="cirurgia odontológica",infoadd="15 dias de repouso")
 
-        # CT3 - Arquivar consulta existente
-        self.admin.agendar_consulta(cpf="admin",data=datetime.now()
+        # CT3 - Arquivar consulta sem ser Dentista
+        self.sistema.agendar_consulta(cpf="admin",data=datetime.now()
                                     ,nome_dentista="admin",cpf_dentista="admin",descricao="reagentamento")
-        assert self.dentista.arquivar_consulta(cpf="admin")
+        assert not self.sistema.arquivar_consulta(cpf="admin")
+        
+        # CT4 - Arquivar consulta existente
+        self.sistema.user = Dentista()
+        assert self.sistema.arquivar_consulta(cpf="admin")
 
         # CT4 - Arquivar consulta inexistente
-        assert not self.dentista.arquivar_consulta(cpf="admin")
+        assert not self.sistema.arquivar_consulta(cpf="admin")
 
     
     # CNT10 - Visualizar informações de dentista
     @pytest.mark.run(order=10) 
     def test_visualizar_informacoes_dentista(self):
-    
+
         # CT1 - Visualizar informações dos dentistas cadastrados
-        assert not isinstance(self.admin.visualizar_dentistas(),bool)
+        self.sistema.user = Admin()
+        assert self.sistema.visualizar_dentistas()
 
         # CT2 - Visualizar informações de um dentista existente
-        assert not isinstance(self.admin.visualizar_dentista(cpf="teste"),bool)
+        assert self.sistema.visualizar_dentista(cpf="teste")
 
         # CT3 - Tentativa de visualizar dentista inexistente
-        assert isinstance(self.admin.visualizar_dentista(cpf="-1291839j"),bool)
+        assert not self.sistema.visualizar_dentista(cpf="-1291839j")
 
         # CT4 - Tentativa de visualizar agenda de dentista existente
-        self.admin.agendar_consulta(cpf="admin",data=datetime.now()
+        self.sistema.agendar_consulta(cpf="admin",data=datetime.now()
                                     ,nome_dentista="admin",cpf_dentista="admin",descricao="reagentamento")
-        self.admin.agendar_consulta(cpf="teste",data=datetime.now()
+        self.sistema.agendar_consulta(cpf="teste",data=datetime.now()
                                     ,nome_dentista="admin",cpf_dentista="admin",descricao="reagentamento")
-        assert not isinstance(self.admin.ver_agenda_dentista(cpf="admin"),bool)
-        assert not isinstance(self.dentista.ver_agenda(),bool)
-        assert (self.dentista.ver_agenda() == self.admin.ver_agenda_dentista(cpf="admin"))
+        r = self.sistema.ver_agenda_dentista(cpf="admin")
+        assert r
+        self.sistema.user = Dentista()
+        assert self.sistema.ver_agenda()
+        assert (self.sistema.ver_agenda() == r)
 
         # CT5 - Tentativa de visualizar agenda de dentista existente mas sem consultas registradas
-        self.dentista.cancelar_consulta(cpf="admin")
-        self.dentista.cancelar_consulta(cpf="teste")
-        dentista = Dentista(cpf="teste")
-        assert  isinstance(self.admin.ver_agenda_dentista(cpf="teste"),bool)
-        assert  isinstance(dentista.ver_agenda(),bool)
-    """
+        self.sistema.cancelar_consulta(cpf="admin")
+        self.sistema.cancelar_consulta(cpf="teste")
+        self.sistema.fazer_login(tipo_usuario="Dentista",cpf="teste",senha="teste123")
+        assert  not self.sistema.ver_agenda_dentista(cpf="teste")
+        assert  not self.sistema.ver_agenda()

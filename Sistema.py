@@ -298,9 +298,9 @@ class Sistema:
 
 # Ações Unicas dos Dentista
 
-    def adicionar_anexo(self,cpf,tipo,info,info_adicionais):
+    def adicionar_anexo(self,cpf,tipo,info,infoadd):
         if self.login and isinstance(self.user,Dentista) :
-            resposta = self.user.adicionar_anexo(cpf,tipo,info,info_adicionais)
+            resposta = self.user.adicionar_anexo(cpf,tipo,info,infoadd)
             return resposta
         else:
             print("Ação não é permitida.")
@@ -323,6 +323,18 @@ class Sistema:
             resposta = self.user.cancelar_consulta(cpf)
             if resposta:
                 self.notificar(cpf,"Consulta Cancelada, solicite um novo agendamento.")
+                return True
+            else:
+                return False
+        else:
+            print("Ação não é permitida.")
+            return False
+        
+    def arquivar_consulta(self,cpf):
+        if self.login and isinstance(self.user,Dentista) :
+            resposta = self.user.arquivar_consulta(cpf)
+            if resposta:
+                self.notificar(cpf,"Consulta Registrada.")
                 return True
             else:
                 return False
@@ -356,7 +368,7 @@ class Sistema:
             print("Ação não é permitida.")
             return False 
     
-    def realizar_pagamento(self,pagamento,tipo_pagamento):
+    def realizar_pagamento(self,pagamento,tipo_pagamento=None):
         if self.login and isinstance(self.user,Paciente) :
             resposta = self.user.realizar_pagamento(pagamento,tipo_pagamento)
             return resposta
